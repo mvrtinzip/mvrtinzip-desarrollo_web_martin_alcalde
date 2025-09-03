@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agregar aviso de adopción</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- Barra superior -->
+  <nav class="topbar" aria-label="Atajos">
+    <a class="active" href="./index.html">Portada</a>
+    <a href="./agregar.html">+Agregar aviso</a>
+    <a href="./listado.html">Ver listado</a>
+    <a href="./estadisticas.html"> Estadísticas</a>
+  </nav>
+
+  <main class="container">
+    <h1>Agregar aviso de adopción </h1>
+
+    <!-- Caja de errores que se muestra solo si es que hay errores -->
+    <div id="errores" class="error-box" role="alert" aria-live="assertive">
+      <h3>Revisa estos campos:</h3>
+      <ul id="lista-errores"></ul>
+    </div>
+
+    <!-- Mensaje de éxito que se muestra al confirmar envío -->
+    <div id="resultado" class="ok-box" aria-live="polite">
+      <h3>¡Hemos recibido la información de adopción, muchas gracias y suerte!</h3>
+      <p><a class="boton" href="./index.html">Volver a la portada</a></p>
+    </div>
+
+    <form id="form-aviso" novalidate>
+      <!-- ¿Dónde? -->
+      <fieldset>
+        <legend>¿Dónde?</legend>
+        <div class="fila">
+          <div class="ctrl">
+            <label for="region">Región</label>
+            <select id="region" name="region"></select>
+            <p class="ayuda">Obligatorio.</p>
+          </div>
+          <div class="ctrl">
+            <label for="comuna">Comuna</label>
+            <select id="comuna" name="comuna" disabled></select>
+            <p class="ayuda">Obligatorio (se habilita al elegir región).</p>
+          </div>
+          <div class="ctrl">
+            <label for="sector">Sector</label>
+            <input id="sector" name="sector" type="text" maxlength="100" />
+            <p class="ayuda">Opcional. Máximo 100 caracteres.</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ¿Contacto? -->
+      <fieldset>
+        <legend>¿Contacto de esta publicación?</legend>
+        <div class="fila">
+          <div class="ctrl">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" />
+            <p class="ayuda">Obligatorio. Entre 3 y 200 caracteres.</p>
+          </div>
+          <div class="ctrl">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" />
+            <p class="ayuda">Obligatorio. Formato email. Máximo 100.</p>
+          </div>
+          <div class="ctrl">
+            <label for="telefono">Número de celular</label>
+            <input id="telefono" name="telefono" type="tel" placeholder="+569.12345678" />
+            <p class="ayuda">Obligatorio. Formato +NNN.NNNNNNNN, ej: +569.12345678</p>
+          </div>
+        </div>
+
+        <div class="separador"></div>
+
+        <div class="fila fila-compacta">
+          <div class="ctrl" style="min-width:220px">
+            <label>Contactar por</label>
+            <div id="contactos" class="grid-contactos"></div>
+            <button type="button" id="btn-add-contacto" class="boton" aria-describedby="ayuda-contactos">Agregar otro contacto</button>
+            <p id="ayuda-contactos" class="ayuda">Opcional. Máximo 5 medios. Cada medio debe informar ID o URL (4–50).</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ¿Qué mascota? -->
+      <fieldset>
+        <legend>¿Qué mascota en adopción?</legend>
+        <div class="fila">
+          <div class="ctrl">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo">
+              <option value="">Seleccione…</option>
+              <option value="gato">Gato</option>
+              <option value="perro">Perro</option>
+            </select>
+            <p class="ayuda">Obligatorio.</p>
+          </div>
+
+          <div class="ctrl">
+            <label for="cantidad">Cantidad</label>
+            <input id="cantidad" name="cantidad" type="number" inputmode="numeric" />
+            <p class="ayuda">Obligatorio.</p>
+          </div>
+
+          <div class="ctrl">
+            <label for="edad">Edad</label>
+            <input id="edad" name="edad" type="number" inputmode="numeric" />
+            <p class="ayuda">Obligatorio.</p>
+          </div>
+
+          <div class="ctrl">
+            <label for="unidad-edad">Unidad medida edad</label>
+            <select id="unidad-edad" name="unidad-edad">
+              <option value="">Seleccione…</option>
+              <option value="meses">Meses</option>
+              <option value="años">Años</option>
+            </select>
+            <p class="ayuda">Obligatorio.</p>
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="ctrl">
+            <label for="fecha-entrega">Fecha disponible para entrega</label>
+            <input id="fecha-entrega" name="fecha-entrega" type="datetime-local" />
+            <p class="ayuda">Obligatorio. Debe ser ≥ a la fecha prellenada (hoy + 3 h).</p>
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="ctrl">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" name="descripcion" cols="50" rows="10"></textarea>
+            <p class="ayuda">Opcional.</p>
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="ctrl">
+            <label>Foto(s) de la mascota</label>
+            <div id="fotos"></div>
+            <button type="button" id="btn-add-foto" class="boton">Agregar otra foto</button>
+            <p class="ayuda">Obligatorio. Mínimo 1 y máximo 5 fotos. Solo imágenes.</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="fila">
+        <button type="button" id="btn-enviar" class="btn-primario">Agregar este aviso de adopción</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="./region_comuna.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

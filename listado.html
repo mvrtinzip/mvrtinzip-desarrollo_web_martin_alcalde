@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Listado de Avisos de Adopción</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+ <!-- Barra superior -->
+  <nav class="topbar" aria-label="Atajos">
+    <a class="active" href="./index.html">Portada</a>
+    <a href="./agregar.html">+Agregar aviso</a>
+    <a href="./listado.html">Ver listado</a>
+    <a href="./estadisticas.html"> Estadísticas</a>
+  </nav>
+
+  <main class="container">
+    <h1>Listado de Avisos de Adopción 📁</h1>
+    <div class="tabla-wrapper">
+      <table id="tabla" class="listado-click">
+        <thead>
+          <tr>
+            <th>Fecha Publicación</th>
+            <th>Fecha Entrega</th>
+            <th>Comuna</th>
+            <th>Sector</th>
+            <th>Cantidad tipo edad</th>
+            <th>Nombre Contacto</th>
+            <th>Total fotos</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="./avisos_data.js"></script>
+  <script>
+    const tbody=document.getElementById("tbody");
+    AVISOS.forEach(a=>{
+      const tr=document.createElement("tr"); tr.dataset.id=a.id;
+      tr.innerHTML=`
+        <td>${a.fechaPublicacion}</td>
+        <td>${a.fechaEntrega}</td>
+        <td>${a.comuna}</td>
+        <td>${a.sector}</td>
+        <td>${a.cantidad} ${a.tipo}<br>${a.edad} ${a.unidadEdad}</td>
+        <td>${a.contactoNombre}</td>
+        <td>${a.fotos320.length}</td>`;
+      tbody.appendChild(tr);
+    });
+    tbody.addEventListener("click",ev=>{
+      const fila=ev.target.closest("tr[data-id]");
+      if(fila) window.location.href=`./aviso.html?id=${fila.dataset.id}`;
+    });
+  </script>
+</body>
+</html>
+

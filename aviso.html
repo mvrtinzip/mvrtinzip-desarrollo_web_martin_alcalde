@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detalle del Aviso</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<!-- Barra superior -->
+  <nav class="topbar" aria-label="Atajos">
+    <a class="active" href="./index.html">Portada</a>
+    <a href="./agregar.html">+Agregar aviso</a>
+    <a href="./listado.html">Ver listado</a>
+    <a href="./estadisticas.html"> Estadísticas</a>
+  </nav>
+
+  <main class="container" id="contenido">
+    <h1>Detalle del aviso</h1>
+    <section class="bloque">
+      <div class="grid">
+        <div><span class="label">Fecha publicación:</span> <span id="pub"></span></div>
+        <div><span class="label">Fecha entrega:</span> <span id="ent"></span></div>
+        <div><span class="label">Comuna:</span> <span id="com"></span></div>
+        <div><span class="label">Sector:</span> <span id="sec"></span></div>
+        <div><span class="label">Cantidad / Tipo / Edad:</span> <span id="det"></span></div>
+        <div><span class="label">Nombre contacto:</span> <span id="nom"></span></div>
+      </div>
+    </section>
+
+    <section class="bloque">
+      <h2>Fotos (clic para ampliar)</h2>
+      <div id="fotos" class="fotos"></div>
+      <div class="acciones">
+        <a class="btn" href="./listado.html">Volver al listado</a>
+        <a class="btn" href="./index.html">Volver a la portada</a>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="modal" class="modal">
+    <div class="modal-card">
+      <img id="img-ampliada" src="" alt="Foto ampliada">
+      <div class="acciones">
+        <button class="btn cerrar" id="btn-cerrar">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="./avisos_data.js"></script>
+  <script>
+    const params=new URLSearchParams(location.search);
+    const id=Number(params.get("id"));
+    const aviso=AVISOS.find(a=>a.id===id)||AVISOS[0];
+
+    document.getElementById("pub").textContent=aviso.fechaPublicacion;
+    document.getElementById("ent").textContent=aviso.fechaEntrega;
+    document.getElementById("com").textContent=aviso.comuna;
+    document.getElementById("sec").textContent=aviso.sector;
+    document.getElementById("det").textContent=`${aviso.cantidad} ${aviso.tipo} — ${aviso.edad} ${aviso.unidadEdad}`;
+    document.getElementById("nom").textContent=aviso.contactoNombre;
+
+    const fotosBox=document.getElementById("fotos");
+    aviso.fotos320.forEach((src320,i)=>{
+      const img=document.createElement("img");
+      img.src=src320; img.alt=`Foto ${i+1}`; img.dataset.full=aviso.fotos800[i]||src320;
+      fotosBox.appendChild(img);
+    });
+
+    const modal=document.getElementById("modal");
+    const imgAmp=document.getElementById("img-ampliada");
+    const btnCerrar=document.getElementById("btn-cerrar");
+
+    fotosBox.addEventListener("click",e=>{
+      const img=e.target.closest("img"); if(!img) return;
+      imgAmp.src=img.dataset.full; modal.showModal();
+    });
+    btnCerrar.addEventListener("click",()=>modal.close());
+    modal.addEventListener("click",e=>{
+      const card=document.querySelector(".modal-card");
+      if(!card.contains(e.target)) modal.close();
+    });
+  </script>
+</body>
+</html>
+
