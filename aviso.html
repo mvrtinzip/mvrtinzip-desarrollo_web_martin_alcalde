@@ -21,10 +21,14 @@
       <div class="grid">
         <div><span class="label">Fecha publicación:</span> <span id="pub"></span></div>
         <div><span class="label">Fecha entrega:</span> <span id="ent"></span></div>
+        <div><span class="label">Región:</span> <span id="reg"></span></div>
         <div><span class="label">Comuna:</span> <span id="com"></span></div>
         <div><span class="label">Sector:</span> <span id="sec"></span></div>
         <div><span class="label">Cantidad / Tipo / Edad:</span> <span id="det"></span></div>
         <div><span class="label">Nombre contacto:</span> <span id="nom"></span></div>
+        <div><span class="label">Email contacto:</span> <span id="ema"></span></div>
+        <div><span class="label">Teléfono contacto:</span> <span id="tel"></span></div>
+      </div>
       </div>
     </section>
 
@@ -53,17 +57,29 @@
     const id=Number(params.get("id"));
     const aviso=AVISOS.find(a=>a.id===id)||AVISOS[0];
 
-    document.getElementById("pub").textContent=aviso.fechaPublicacion;
-    document.getElementById("ent").textContent=aviso.fechaEntrega;
-    document.getElementById("com").textContent=aviso.comuna;
-    document.getElementById("sec").textContent=aviso.sector;
-    document.getElementById("det").textContent=`${aviso.cantidad} ${aviso.tipo} — ${aviso.edad} ${aviso.unidadEdad}`;
-    document.getElementById("nom").textContent=aviso.contactoNombre;
+    document.getElementById("pub").textContent = aviso.fechaPublicacion;
+    document.getElementById("ent").textContent = aviso.fechaEntrega;
+    document.getElementById("reg").textContent = aviso.region || "";
+    document.getElementById("com").textContent = aviso.comuna;
+    document.getElementById("sec").textContent = aviso.sector;
 
-    const fotosBox=document.getElementById("fotos");
-    aviso.fotos320.forEach((src320,i)=>{
-      const img=document.createElement("img");
-      img.src=src320; img.alt=`Foto ${i+1}`; img.dataset.full=aviso.fotos800[i]||src320;
+    const m = aviso.mascota || { cantidad: "", tipo: "", edad: "", unidad: "" };
+    document.getElementById("det").textContent = `${m.cantidad} ${m.tipo} — ${m.edad} ${m.unidad}`;
+
+    const c = aviso.contacto || { nombre: "", email: "", telefono: "" };
+    document.getElementById("nom").textContent = c.nombre || "";
+    document.getElementById("ema").textContent = c.email || "";
+    document.getElementById("tel").textContent = c.telefono || "";
+
+    const fotosBox = document.getElementById("fotos");
+    const fotos320 = (aviso.fotos && aviso.fotos.fotos320) ? aviso.fotos.fotos320 : [];
+    const fotos800 = (aviso.fotos && aviso.fotos.fotos800) ? aviso.fotos.fotos800 : [];
+
+    fotos320.forEach((src320, i) => {
+      const img = document.createElement("img");
+      img.src = src320;
+      img.alt = `Foto ${i + 1}`;
+      img.dataset.full = fotos800[i] || src320; 
       fotosBox.appendChild(img);
     });
 

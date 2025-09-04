@@ -1,4 +1,3 @@
-
 const $ = (sel) => document.querySelector(sel);
 const create = (tag, attrs = {}, children = []) => {
   const el = document.createElement(tag);
@@ -12,11 +11,10 @@ const create = (tag, attrs = {}, children = []) => {
 };
 const isEmpty = (v) => !v || String(v).trim() === "";
 
-/* ===== Regiones / Comunas (desde region_comuna.js) ===== */
+/* Regiones / Comunas */
 function poblarRegiones() {
   const regionSel = $("#region");
   regionSel.innerHTML = '<option value="">Seleccione…</option>';
-  // Estructura esperada: region_comuna.regiones = [{ nombre, comunas: [{nombre}, ...] }, ...]
   region_comuna.regiones.forEach(r => {
     regionSel.appendChild(create("option", { value: r.nombre, text: r.nombre }));
   });
@@ -37,7 +35,7 @@ function actualizarComunas() {
   }
 }
 
-/* ===== Contactar por (hasta 5) ===== */
+/* Contactar por */
 const MEDIOS = ["whatsapp", "telegram", "X", "instagram", "tiktok", "otra"];
 const MAX_CONTACTOS = 5;
 
@@ -83,7 +81,7 @@ function agregarContacto() {
   actualizarBotonContacto();
 }
 
-/* ===== Fotos (1 a 5 inputs file, solo imágenes) ===== */
+/*  Fotos */
 const MAX_FOTOS = 5;
 
 function nuevaEntradaFoto() {
@@ -102,11 +100,11 @@ function agregarFoto() {
   $("#btn-add-foto").disabled = totalFotos() >= MAX_FOTOS;
 }
 
-/* ===== Prefill fecha (ahora + 3 horas) ===== */
+/*  Prefill de fecha */
 function prefillFecha() {
   const input = $("#fecha-entrega");
   const now = new Date();
-  // evitar desplazamiento por zona horaria en datetime-local
+  // Para evitar desplazamiento por zona horaria en datetime-local
   now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
   const plus3 = new Date(now.getTime() + 3 * 60 * 60 * 1000);
   const yyyy = plus3.getFullYear();
@@ -115,10 +113,10 @@ function prefillFecha() {
   const hh = String(plus3.getHours()).padStart(2, "0");
   const mi = String(plus3.getMinutes()).padStart(2, "0");
   input.value = `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
-  input.dataset.min = input.value; // para validación JS posterior
+  input.dataset.min = input.value; 
 }
 
-/* ===== Validaciones ===== */
+/* Validaciones */
 function valRegionComuna() {
   const r = $("#region").value;
   const c = $("#comuna").value;
@@ -149,7 +147,6 @@ function valContactoBasico() {
     ok = false; err.push("Email: formato válido y largo ≤ 100.");
   }
 
-  // Teléfono OBLIGATORIO: +NNN.NNNNNNNN  (ej: +569.12345678)
   const reTel = /^\+\d{3}\.\d{8}$/;
   if (tel === "") {
     ok = false; err.push("Teléfono: es obligatorio.");
@@ -220,7 +217,7 @@ function valFotos() {
   return [ok, err];
 }
 
-/* ===== Mostrar/Ocultar resultados ===== */
+/* Mostrar/Ocultar resultados */
 function mostrarErrores(lista) {
   const box = $("#errores");
   const ul = $("#lista-errores");
@@ -239,18 +236,18 @@ function mostrarOK() {
   $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-/* ===== Init ===== */
+/* Init */
 document.addEventListener("DOMContentLoaded", () => {
   // Regiones/Comunas
   poblarRegiones();
   $("#region").addEventListener("change", actualizarComunas);
 
   // Contactos
-  agregarContacto(); // parte con 1 fila
+  agregarContacto(); 
   $("#btn-add-contacto").addEventListener("click", agregarContacto);
 
   // Fotos
-  agregarFoto(); // parte con 1 input
+  agregarFoto(); 
   $("#btn-add-foto").addEventListener("click", agregarFoto);
 
   // Fecha
@@ -271,6 +268,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const seguro = window.confirm("¿Está seguro que desea agregar este aviso de adopción?");
     if (seguro) mostrarOK();
-    // Si elige "No", simplemente se mantiene el formulario visible.
   });
 });

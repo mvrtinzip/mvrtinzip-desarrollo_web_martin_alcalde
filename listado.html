@@ -37,24 +37,29 @@
 
   <script src="./avisos_data.js"></script>
   <script>
-    const tbody=document.getElementById("tbody");
-    AVISOS.forEach(a=>{
-      const tr=document.createElement("tr"); tr.dataset.id=a.id;
-      tr.innerHTML=`
-        <td>${a.fechaPublicacion}</td>
-        <td>${a.fechaEntrega}</td>
-        <td>${a.comuna}</td>
-        <td>${a.sector}</td>
-        <td>${a.cantidad} ${a.tipo}<br>${a.edad} ${a.unidadEdad}</td>
-        <td>${a.contactoNombre}</td>
-        <td>${a.fotos320.length}</td>`;
+    const tbody = document.getElementById("tbody");
+  
+    AVISOS.forEach(a => {
+      const tr = document.createElement("tr");
+      tr.dataset.id = a.id;
+      const { fechaPublicacion, fechaEntrega, comuna, sector, contacto, mascota, fotos } = a;
+  
+      tr.innerHTML = `
+        <td>${fechaPublicacion}</td>
+        <td>${fechaEntrega}</td>
+        <td>${comuna}</td>
+        <td>${sector}</td>
+        <td>${mascota.cantidad} ${mascota.tipo}<br>${mascota.edad} ${mascota.unidad}</td>
+        <td>${contacto.nombre}</td>
+        <td>${(fotos?.fotos320 || []).length}</td>
+      `;
       tbody.appendChild(tr);
     });
-    tbody.addEventListener("click",ev=>{
-      const fila=ev.target.closest("tr[data-id]");
-      if(fila) window.location.href=`./aviso.html?id=${fila.dataset.id}`;
+    tbody.addEventListener("click", (ev) => {
+      const fila = ev.target.closest("tr[data-id]");
+      if (fila) window.location.href = `./aviso.html?id=${fila.dataset.id}`;
     });
-  </script>
+  </script>  
 </body>
 </html>
 
