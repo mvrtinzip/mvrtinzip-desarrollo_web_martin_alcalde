@@ -106,7 +106,7 @@ function prefillFecha() {
   const now = new Date();
   // Para evitar desplazamiento por zona horaria en datetime-local
   now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  const plus3 = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+  const plus3 = new Date(now.getTime() * 60 * 60 * 1000);
   const yyyy = plus3.getFullYear();
   const mm = String(plus3.getMonth() + 1).padStart(2, "0");
   const dd = String(plus3.getDate()).padStart(2, "0");

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Detalle del Aviso</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
@@ -29,7 +29,6 @@
         <div><span class="label">Email contacto:</span> <span id="ema"></span></div>
         <div><span class="label">Teléfono contacto:</span> <span id="tel"></span></div>
       </div>
-      </div>
     </section>
 
     <section class="bloque">
@@ -44,7 +43,7 @@
 
   <dialog id="modal" class="modal">
     <div class="modal-card">
-      <img id="img-ampliada" src="" alt="Foto ampliada">
+      <img id="img-ampliada" src="about:blank" alt="Foto ampliada">
       <div class="acciones">
         <button class="btn cerrar" id="btn-cerrar">Cerrar</button>
       </div>
@@ -53,9 +52,9 @@
 
   <script src="./avisos_data.js"></script>
   <script>
-    const params=new URLSearchParams(location.search);
-    const id=Number(params.get("id"));
-    const aviso=AVISOS.find(a=>a.id===id)||AVISOS[0];
+    const params = new URLSearchParams(location.search);
+    const id = Number(params.get("id"));
+    const aviso = AVISOS.find(a => a.id === id) || AVISOS[0];
 
     document.getElementById("pub").textContent = aviso.fechaPublicacion;
     document.getElementById("ent").textContent = aviso.fechaEntrega;
@@ -79,24 +78,23 @@
       const img = document.createElement("img");
       img.src = src320;
       img.alt = `Foto ${i + 1}`;
-      img.dataset.full = fotos800[i] || src320; 
+      img.dataset.full = fotos800[i] || src320;
       fotosBox.appendChild(img);
     });
 
-    const modal=document.getElementById("modal");
-    const imgAmp=document.getElementById("img-ampliada");
-    const btnCerrar=document.getElementById("btn-cerrar");
+    const modal = document.getElementById("modal");
+    const imgAmp = document.getElementById("img-ampliada");
+    const btnCerrar = document.getElementById("btn-cerrar");
 
-    fotosBox.addEventListener("click",e=>{
-      const img=e.target.closest("img"); if(!img) return;
-      imgAmp.src=img.dataset.full; modal.showModal();
+    fotosBox.addEventListener("click", e => {
+      const img = e.target.closest("img"); if (!img) return;
+      imgAmp.src = img.dataset.full; modal.showModal();
     });
-    btnCerrar.addEventListener("click",()=>modal.close());
-    modal.addEventListener("click",e=>{
-      const card=document.querySelector(".modal-card");
-      if(!card.contains(e.target)) modal.close();
+    btnCerrar.addEventListener("click", () => modal.close());
+    modal.addEventListener("click", e => {
+      const card = document.querySelector(".modal-card");
+      if (!card.contains(e.target)) modal.close();
     });
   </script>
 </body>
-</html>
-
+</html> 
