@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inicio - Avisos de Adopción</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <!-- Barra superior -->
+  <nav class="topbar" aria-label="Menú principal">
+    <a class="active" href="{{ url_for('index') }}">Portada</a>
+    <a href="{{ url_for('agregar_aviso') }}">+Agregar aviso</a>
+    <a href="{{ url_for('listado') }}">Ver listado</a>
+    <a href="{{ url_for('estadisticas') }}">Estadísticas</a>
+  </nav>
+
+  <!-- Contenido principal -->
+  <main class="container">
+    <h1> Avisos de adopción </h1>
+
+    <p><strong>¡Bienvenid@!</strong></p>
+    <p>Estos son los avisos de adopción más recientes publicados en nuestra plataforma.
+      <strong>¡Quizás aquí encuentres a tu próximo compañero!</strong>
+    </p>
+
+    <h2>Últimos 5 avisos</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha publicación</th>
+          <th>Comuna</th>
+          <th>Sector</th>
+          <th style="text-align: left;">
+            <div>Cantidad</div>
+            <div>Tipo</div>
+            <div>Edad</div>
+          </th>
+          <th>Foto</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if ultimos %}
+          {% for aviso in ultimos %}
+            <tr>
+              <td>
+                {% if aviso.fecha_ingreso %}
+                  {{ aviso.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}
+                {% else %}
+                  Sin fecha
+                {% endif %}
+              </td>
+              <td>{{ aviso.comuna }}</td>
+              <td>{{ aviso.sector or "—" }}</td>
+              <td>
+                {{ aviso.cantidad }} {{ aviso.tipo }}<br />
+                {{ aviso.edad }} {{ 'meses' if aviso.unidad_medida == 'm' else 'años' }}
+              </td>
+              <td>
+                {% if aviso.foto %}
+                  <img src="{{ aviso.foto }}" alt="Foto mascota" style="width: 200px;"><br />
+                {% else %}
+                  Sin foto
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5" style="text-align: center;">No hay avisos de adopción.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

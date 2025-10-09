@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Listado de Avisos de Adopción</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <!-- Barra superior -->
+  <nav class="topbar" aria-label="Atajos">
+    <a href="{{ url_for('index') }}">Portada</a>
+    <a href="{{ url_for('agregar_aviso') }}">+Agregar aviso</a>
+    <a class="active" href="{{ url_for('listado') }}">Ver listado</a>
+    <a href="{{ url_for('estadisticas') }}">Estadísticas</a>
+  </nav>
+
+  <main class="container">
+    <h1>Listado de Avisos de Adopción 📋</h1>
+
+    {% if avisos %}
+    <div class="tabla-wrapper">
+      <table id="tabla" class="listado-click">
+        <thead>
+          <tr>
+            <th>Fecha Publicación</th>
+            <th>Fecha Entrega</th>
+            <th>Comuna</th>
+            <th>Sector</th>
+            <th>Cantidad tipo edad</th>
+            <th>Nombre Contacto</th>
+            <th>Total fotos</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          {% for aviso in avisos %}
+          <tr data-id="{{ aviso.id }}">
+            <td>{{ aviso.fecha_publicacion }}</td>
+            <td>{{ aviso.fecha_entrega }}</td>
+            <td>{{ aviso.comuna }}</td>
+            <td>{{ aviso.sector }}</td>
+            <td>{{ aviso.cantidad }} {{ aviso.tipo }}<br>{{ aviso.edad }} {{ aviso.unidad_medida }}</td>
+            <td>{{ aviso.nombre_contacto }}</td>
+            <td>{{ aviso.cantidad_fotos }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Controles de paginación -->
+    <div class="paginacion">
+      {% if page > 1 %}
+        <a href="{{ url_for('listado', page=page-1) }}" class="btn-paginacion">← Anterior</a>
+      {% else %}
+        <span class="btn-paginacion disabled">← Anterior</span>
+      {% endif %}
+
+      <span class="paginacion-info">Página {{ page }} de {{ total_pages }}</span>
+
+      {% if page < total_pages %}
+        <a href="{{ url_for('listado', page=page+1) }}" class="btn-paginacion">Siguiente →</a>
+      {% else %}
+        <span class="btn-paginacion disabled">Siguiente →</span>
+      {% endif %}
+    </div>
+
+    {% else %}
+      <p class="mensaje-vacio">No hay avisos de adopción registrados todavía.</p>
+    {% endif %}
+  </main>
+
+  <script>
+    
+    // Hacer filas clicables
+    document.getElementById("tbody")?.addEventListener("click", (ev) => {
+      const fila = ev.target.closest("tr[data-id]");
+      if (fila) {
+        window.location.href = `/aviso/${fila.dataset.id}`;
+      }
+    });
+  </script>
+</body>
+</html>

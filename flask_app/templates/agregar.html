@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>+ Agregar aviso de adopción</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+  <!-- Barra superior -->
+  <nav class="topbar" aria-label="Atajos">
+    <a href="{{ url_for('index') }}">Portada</a>
+    <a class="active" href="{{ url_for('agregar_aviso') }}">+Agregar aviso</a>
+    <a href="{{ url_for('listado') }}">Ver listado</a>
+    <a href="{{ url_for('estadisticas') }}">Estadísticas</a>
+  </nav>
+
+  <main class="container">
+    <h1>+ Agregar aviso de adopción</h1>
+
+    <!-- Mensaje de éxito -->
+    {% if mensaje_exito %}
+      <div class="success-box" role="alert">
+        <h2>¡Hemos recibido la información de adopción, muchas gracias y suerte!</h2>
+        <p>{{ mensaje_exito }}</p>
+        <a href="{{ url_for('index') }}">Volver a la portada</a>
+      </div>
+    {% else %}
+
+    <!-- Errores del frontend -->
+    <div id="errores" class="error-box" role="alert" aria-live="assertive">
+      <h3>Revisa estos campos:</h3>
+      <ul id="lista-errores"></ul>
+    </div>
+
+    <!-- Errores del backend -->
+    {% if error %}
+      <div class="error-box" role="alert" style="display: block;">
+        <h3>Revisa estos campos:</h3>
+        <ul>
+          {% for e in error %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form id="form-aviso" action="{{ url_for('agregar_aviso') }}" method="POST" enctype="multipart/form-data" novalidate>
+      
+      <!-- SECCIÓN 1: ¿Dónde? -->
+      <fieldset>
+        <legend>¿Dónde?</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="region_id">Región</label>
+            <select name="region" id="region_id" required>
+              <option value="">Seleccione…</option>
+              {% for region in regiones %}
+                <option value="{{ region.id }}">{{ region.nombre }}</option>
+              {% endfor %}
+            </select>
+            <small>Obligatorio.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="comuna_id">Comuna</label>
+            <select name="comuna" id="comuna_id" required>
+              <option value="">Seleccione una comuna</option>
+              {% for comuna in comunas %}
+                <option value="{{ comuna.id }}" data-region-id="{{ comuna.region_id }}" hidden>{{ comuna.nombre }}</option>
+              {% endfor %}
+            </select>
+            <small>Obligatorio (se habilita al elegir región).</small>
+          </div>
+
+          <div class="form-group">
+            <label for="sector">Sector</label>
+            <input type="text" name="Sector" id="sector" maxlength="100" placeholder="Ej: Plaza Ñuñoa" />
+            <small>Opcional. Máximo 100 caracteres.</small>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- SECCIÓN 2: ¿Contacto de esta publicación? -->
+      <fieldset>
+        <legend>¿Contacto de esta publicación?</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="Nombre" id="nombre" maxlength="200" required />
+            <small>Obligatorio. Entre 3 y 200 caracteres.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="Email" id="email" maxlength="100" required />
+            <small>Obligatorio. Formato email. Máximo 100.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="numero">Número de celular</label>
+            <input type="tel" name="Numero" id="numero" placeholder="+569.12345678" required />
+            <small>Obligatorio. Formato +NNN.NNNNNNNN, ej: +569.12345678</small>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="contacto-tipo">Contactar por</label>
+            <select name="Contacto" id="contacto-tipo">
+              <option value="">Seleccione medio…</option>
+              <option value="whatsapp">Whatsapp</option>
+              <option value="telegram">Telegram</option>
+              <option value="X">X</option>
+              <option value="instagram">Instagram</option>
+              <option value="tiktok">Tiktok</option>
+              <option value="otra">Otra</option>
+            </select>
+            <small>Opcional.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="contacto-id">ID o URL del contacto</label>
+            <input type="text" name="ID" id="contacto-id" placeholder="ID o URL (4-50)" minlength="4" maxlength="50" />
+            <small>Opcional. Debe tener entre 4 y 50 caracteres.</small>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- SECCIÓN 3: ¿Qué mascota en adopción? -->
+      <fieldset>
+        <legend>¿Qué mascota en adopción?</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="tipo">Tipo</label>
+            <select name="Tipo" id="tipo" required>
+              <option value="">Seleccione…</option>
+              <option value="perro">Perro</option>
+              <option value="gato">Gato</option>
+            </select>
+            <small>Obligatorio.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="cantidad">Cantidad</label>
+            <input type="number" name="Cantidad" id="cantidad" min="1" required />
+            <small>Obligatorio.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="edad">Edad</label>
+            <input type="number" name="Edad" id="edad" min="1" required />
+            <small>Obligatorio.</small>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="unidad">Unidad medida edad</label>
+            <select name="Unidad_medida_edad" id="unidad" required>
+              <option value="">Seleccione…</option>
+              <option value="m">Meses</option>
+              <option value="a">Años</option>
+            </select>
+            <small>Obligatorio.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="fecha">Fecha disponible para entrega</label>
+            <input type="datetime-local" name="Fecha_entrega" id="fecha" required />
+            <small>Obligatorio. Debe ser ≥ a la fecha y hora actual.</small>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="descripcion">Descripción</label>
+          <textarea name="Descripción" id="descripcion" rows="4" maxlength="300"></textarea>
+          <small>Opcional.</small>
+        </div>
+      </fieldset>
+
+      <!-- SECCIÓN 4: Foto(s) de la mascota -->
+      <fieldset>
+        <legend>Foto(s) de la mascota</legend>
+        <div class="form-group">
+          <div id="fotos-container">
+            <input type="file" name="Foto" class="foto-input" accept="image/*" required style="margin-bottom: 10px;" />
+          </div>
+          <button type="button" id="btn-agregar-foto" class="btn-agregar">
+            Agregar otra foto
+          </button>
+          <small>Obligatorio. Mínimo 1 y máximo 5 fotos. Solo imágenes.</small>
+        </div>
+      </fieldset>
+
+      <button type="button" id="btn-enviar" class="btn-enviar-form">Agregar este aviso de adopción</button>
+    </form>
+    {% endif %}
+  </main>
+
+  <!-- Cargar app.js para validaciones frontend -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+  <!-- Script para manejar el filtro de comunas y fotos -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const regionSelect = document.getElementById("region_id");
+      const comunaSelect = document.getElementById("comuna_id");
+
+      if (regionSelect && comunaSelect) {
+        regionSelect.addEventListener("change", () => {
+          const regionId = regionSelect.value;
+
+          Array.from(comunaSelect.options).forEach(opt => {
+            if (opt.value === "") {
+              opt.hidden = false;
+              opt.selected = true;
+            } else {
+              opt.hidden = opt.dataset.regionId !== regionId;
+            }
+          });
+        });
+      }
+
+      // Manejo de fotos
+      const fotosContainer = document.getElementById("fotos-container");
+      const btnAgregarFoto = document.getElementById("btn-agregar-foto");
+      const maxFotos = 5;
+
+      if (!fotosContainer || !btnAgregarFoto) {
+        return;
+      }
+
+      // Contar fotos actuales
+      function contarFotos() {
+        return fotosContainer.querySelectorAll('.foto-input').length;
+      }
+
+      // Botón de Agregar nueva foto
+      btnAgregarFoto.addEventListener("click", (e) => {
+        e.preventDefault();
+        
+        const totalFotos = contarFotos();
+        
+        if (totalFotos >= maxFotos) {
+          alert(`Máximo ${maxFotos} fotos permitidas.`);
+          return;
+        }
+
+        const nuevoInput = document.createElement('input');
+        nuevoInput.type = 'file';
+        nuevoInput.name = 'Foto';
+        nuevoInput.className = 'foto-input';
+        nuevoInput.accept = 'image/*';
+        nuevoInput.style.marginBottom = '10px';
+        nuevoInput.style.display = 'block';
+        nuevoInput.style.width = '100%';
+
+        fotosContainer.appendChild(nuevoInput);
+
+        // Ocultar botón en caso de llegar al máximo
+        if (contarFotos() >= maxFotos) {
+          btnAgregarFoto.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

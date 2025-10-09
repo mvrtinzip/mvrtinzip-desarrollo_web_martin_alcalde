@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle del Aviso</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <!-- Barra superior -->
+  <nav class="topbar" aria-label="Atajos">
+    <a href="{{ url_for('index') }}">Portada</a>
+    <a href="{{ url_for('agregar_aviso') }}">+Agregar aviso</a>
+    <a href="{{ url_for('listado') }}">Ver listado</a>
+    <a href="{{ url_for('estadisticas') }}">Estadísticas</a>
+  </nav>
+
+  <main class="container" id="contenido">
+    <h1>Detalle del aviso</h1>
+    
+    <section class="bloque">
+      <div class="grid">
+        <div><span class="label">Fecha publicación:</span> <span>{{ aviso.fecha_publicacion }}</span></div>
+        <div><span class="label">Fecha entrega:</span> <span>{{ aviso.fecha_entrega }}</span></div>
+        <div><span class="label">Región:</span> <span>{{ aviso.region }}</span></div>
+        <div><span class="label">Comuna:</span> <span>{{ aviso.comuna }}</span></div>
+        <div><span class="label">Sector:</span> <span>{{ aviso.sector }}</span></div>
+        <div><span class="label">Cantidad / Tipo / Edad:</span> <span>{{ aviso.cantidad }} {{ aviso.tipo }} — {{ aviso.edad }} {{ aviso.unidad_medida }}</span></div>
+        <div><span class="label">Nombre contacto:</span> <span>{{ aviso.nombre }}</span></div>
+        <div><span class="label">Email contacto:</span> <span>{{ aviso.email }}</span></div>
+        <div><span class="label">Teléfono contacto:</span> <span>{{ aviso.celular }}</span></div>
+      </div>
+    </section>
+
+    {% if aviso.descripcion and aviso.descripcion != "Sin descripción" %}
+    <section class="bloque">
+      <h2>Descripción</h2>
+      <p>{{ aviso.descripcion }}</p>
+    </section>
+    {% endif %}
+
+    {% if aviso.contactos %}
+    <section class="bloque">
+      <h2>Medios de contacto adicionales</h2>
+      <ul>
+        {% for contacto in aviso.contactos %}
+        <li>
+          <strong>{{ contacto.nombre.value if contacto.nombre.value else contacto.nombre }}:</strong> 
+          {{ contacto.identificador }}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <section class="bloque">
+      <h2>Fotos (clic para ampliar)</h2>
+      {% if aviso.fotos %}
+      <div id="fotos" class="fotos">
+        {% for foto in aviso.fotos %}
+        <img src="{{ foto }}" alt="Foto mascota" data-full="{{ foto }}">
+        {% endfor %}
+      </div>
+      {% else %}
+      <p>No hay fotos disponibles</p>
+      {% endif %}
+
+      <div class="acciones">
+        <a class="btn-detalle" href="{{ url_for('listado') }}">Volver al listado</a>
+        <a class="btn-detalle" href="{{ url_for('index') }}">Volver a la portada</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal para ampliar las fotos -->
+  <dialog id="modal" class="modal-foto">
+    <div class="modal-foto-contenido">
+      <img id="img-ampliada" src="about:blank" alt="Foto ampliada" class="modal-foto-img">
+      <button id="btn-cerrar" class="modal-foto-btn-cerrar">Cerrar</button>
+    </div>
+  </dialog>
+
+  <script>
+    const fotosBox = document.getElementById("fotos");
+    const modal = document.getElementById("modal");
+    const imgAmp = document.getElementById("img-ampliada");
+    const btnCerrar = document.getElementById("btn-cerrar");
+
+    if (fotosBox) {
+      fotosBox.addEventListener("click", e => {
+        const img = e.target.closest("img");
+        if (!img) return;
+        imgAmp.src = img.dataset.full || img.src;
+        modal.showModal();
+      });
+    }
+
+    if (btnCerrar) {
+      btnCerrar.addEventListener("click", () => modal.close());
+    }
+
+    if (modal) {
+      modal.addEventListener("click", e => {
+        const rect = modal.getBoundingClientRect();
+        if (
+          e.clientX < rect.left ||
+          e.clientX > rect.right ||
+          e.clientY < rect.top ||
+          e.clientY > rect.bottom
+        ) {
+          modal.close();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
