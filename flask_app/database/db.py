@@ -2,6 +2,8 @@ from datetime import datetime
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy import create_engine 
 from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey, DateTime, Enum, Text
+from sqlalchemy import func
+from datetime import datetime, timedelta
 import enum
 
 # Setting base de datos
@@ -85,6 +87,15 @@ class ContactarPor(Base):
     aviso_id = Column(BigInteger, ForeignKey('aviso_adopcion.id'), nullable=False)
     aviso = relationship("AvisoAdopcion", back_populates="contactos")
 
+class Comentario(Base):
+    __tablename__ = 'comentario'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre = Column(String(80), nullable=False)
+    texto = Column(String(300), nullable=False)
+    fecha = Column(DateTime, default=datetime.now, nullable=False)
+    aviso_id = Column(Integer, ForeignKey('aviso_adopcion.id'), nullable=False)
+    aviso = relationship("AvisoAdopcion", foreign_keys=[aviso_id])
+
 # Funciones crear
 
 def crear_aviso(comuna_id, sector, nombre, email, celular, tipo, cantidad, edad, unidad_medida, fecha_entrega, descripcion):
@@ -121,6 +132,26 @@ def crear_contacto(nombre, identificador, aviso_id):
     session.add(contacto)
     session.commit()
     session.close()
+
+def validar_comuna_region(id_comuna, id_region):
+    session = SessionLocal()
+    comuna = session.query(Comuna).filter_by(id=id_comuna, region_id=id_region).first()
+    session.close()
+    return comuna is not None
+
+
+def crear_comentario(nombre, texto, aviso_id):
+    session = SessionLocal()
+    comentario = Comentario(
+        nombre=nombre,
+        texto=texto,
+        aviso_id=aviso_id
+    )
+    session.add(comentario)
+    session.commit()
+    comentario_id = comentario.id  
+    session.close()
+    return comentario_id
 
 # Funciones get
 
@@ -183,8 +214,92 @@ def get_todas_comunas():
     session.close()
     return comunas
 
-def validar_comuna_region(id_comuna, id_region):
+
+def get_comentarios(aviso_id):
     session = SessionLocal()
-    comuna = session.query(Comuna).filter_by(id=id_comuna, region_id=id_region).first()
+    comentarios = session.query(Comentario).filter_by(aviso_id=aviso_id).order_by(Comentario.fecha.desc()).all()
+    resultado = []
+    for com in comentarios:
+        resultado.append({
+            'id': com.id,
+            'nombre': com.nombre,
+            'texto': com.texto,
+            'fecha': com.fecha.strftime("%Y-%m-%d %H:%M") if com.fecha else ""
+        })   
     session.close()
-    return comuna is not None
+    return resultado
+
+def get_avisos_por_dia():
+    session = SessionLocal()
+    fecha_inicio = datetime.now() - timedelta(days=30)
+    resultados = session.query(
+        func.date(AvisoAdopcion.fecha_ingreso).label('fecha'),
+        func.count(AvisoAdopcion.id).label('cantidad')
+    ).filter(
+        AvisoAdopcion.fecha_ingreso >= fecha_inicio
+    ).group_by(
+        func.date(AvisoAdopcion.fecha_ingreso)
+    ).order_by('fecha').all()
+    session.close()
+    datos = []
+    for resultado in resultados:
+        datos.append({
+            'fecha': resultado.fecha.strftime('%Y-%m-%d'),
+            'cantidad': resultado.cantidad
+        })
+    return datos
+
+
+def get_avisos_por_tipo():
+    session = SessionLocal()
+    resultados = session.query(
+        AvisoAdopcion.tipo,
+        func.count(AvisoAdopcion.id).label('cantidad')
+    ).group_by(AvisoAdopcion.tipo).all()
+    session.close()
+    datos = []
+    for resultado in resultados:
+        tipo_nombre = resultado.tipo.value if hasattr(resultado.tipo, 'value') else resultado.tipo
+        datos.append({
+            'name': tipo_nombre.capitalize(),
+            'y': resultado.cantidad
+        })
+    return datos
+
+
+def get_avisos_por_mes_y_tipo():
+    session = SessionLocal()
+    fecha_inicio = datetime.now() - timedelta(days=365)
+    resultados = session.query(
+        func.year(AvisoAdopcion.fecha_ingreso).label('anio'),
+        func.month(AvisoAdopcion.fecha_ingreso).label('mes'),
+        AvisoAdopcion.tipo,
+        func.count(AvisoAdopcion.id).label('cantidad')
+    ).filter(
+        AvisoAdopcion.fecha_ingreso >= fecha_inicio
+    ).group_by(
+        func.year(AvisoAdopcion.fecha_ingreso),
+        func.month(AvisoAdopcion.fecha_ingreso),
+        AvisoAdopcion.tipo
+    ).order_by('anio', 'mes').all()
+    session.close()
+    meses_dict = {}
+    for resultado in resultados:
+        mes_key = f"{resultado.anio}-{str(resultado.mes).zfill(2)}"
+        tipo_nombre = resultado.tipo.value if hasattr(resultado.tipo, 'value') else resultado.tipo
+        if mes_key not in meses_dict:
+            meses_dict[mes_key] = {'gato': 0, 'perro': 0}
+        meses_dict[mes_key][tipo_nombre] = resultado.cantidad
+    meses = sorted(meses_dict.keys())
+    gatos = [meses_dict[mes]['gato'] for mes in meses]
+    perros = [meses_dict[mes]['perro'] for mes in meses]
+    meses_nombres = []
+    for mes in meses:
+        anio, mes_num = mes.split('-')
+        fecha = datetime(int(anio), int(mes_num), 1)
+        meses_nombres.append(fecha.strftime('%b %Y'))
+    return {
+        'meses': meses_nombres,
+        'gatos': gatos,
+        'perros': perros
+    }

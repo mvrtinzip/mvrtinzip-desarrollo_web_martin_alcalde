@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from database import db
 from database.db import SessionLocal, Region, AvisoAdopcion
 from utils.validations import validar_aviso
@@ -33,7 +33,7 @@ def index():
 
 @app.route("/agregar", methods=["GET", "POST"])
 def agregar_aviso():
-    print("Ruta /agregar cargada") # Debugging print
+    print("Ruta /agregar cargada")
 
     regiones = db.get_todas_regiones()
     comunas = db.get_comunas()
@@ -176,6 +176,83 @@ def detalle_aviso(aviso_id):
     session.close()
     return render_template("aviso.html", aviso=datos)
 
+
+# COMENTARIOS 
+@app.route("/api/comentarios/<int:aviso_id>", methods=["GET"])
+def obtener_comentarios(aviso_id):
+    """Obtener comentarios de un aviso (llamada AJAX)"""
+    try:
+        comentarios = db.get_comentarios(aviso_id)
+        return jsonify({"success": True, "comentarios": comentarios})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/comentarios/<int:aviso_id>", methods=["POST"])
+def agregar_comentario(aviso_id):
+    """Agregar un comentario (llamada AJAX)"""
+    try:
+        data = request.get_json()
+        nombre = data.get('nombre', '').strip()
+        texto = data.get('texto', '').strip()
+        
+        # Validaciones del servidor
+        errores = []
+        
+        if not nombre or len(nombre) < 3 or len(nombre) > 80:
+            errores.append("El nombre debe tener entre 3 y 80 caracteres")
+        
+        if not texto or len(texto) < 5 or len(texto) > 300:
+            errores.append("El comentario debe tener entre 5 y 300 caracteres")
+        
+        if errores:
+            return jsonify({"success": False, "errores": errores}), 400
+        
+        # Crear comentario
+        db.crear_comentario(nombre, texto, aviso_id)
+        
+        # Obtener todos los comentarios actualizados
+        comentarios = db.get_comentarios(aviso_id)
+        
+        return jsonify({
+            "success": True, 
+            "mensaje": "Comentario agregado exitosamente",
+            "comentarios": comentarios
+        })
+        
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ESTADÍSTICAS 
+@app.route("/api/estadisticas/avisos-por-dia", methods=["GET"])
+def api_avisos_por_dia():
+    """Obtener avisos por día para gráfico de líneas"""
+    try:
+        datos = db.get_avisos_por_dia()
+        return jsonify({"success": True, "datos": datos})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/estadisticas/avisos-por-tipo", methods=["GET"])
+def api_avisos_por_tipo():
+    """Obtener avisos por tipo para gráfico de torta"""
+    try:
+        datos = db.get_avisos_por_tipo()
+        return jsonify({"success": True, "datos": datos})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/estadisticas/avisos-por-mes-tipo", methods=["GET"])
+def api_avisos_por_mes_tipo():
+    """Obtener avisos por mes y tipo para gráfico de barras"""
+    try:
+        datos = db.get_avisos_por_mes_y_tipo()
+        return jsonify({"success": True, "datos": datos})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/estadisticas")
 def estadisticas():

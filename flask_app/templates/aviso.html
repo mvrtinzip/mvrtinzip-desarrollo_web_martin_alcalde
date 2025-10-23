@@ -16,6 +16,9 @@
   </nav>
 
   <main class="container" id="contenido">
+    <!-- ID del aviso (oculto, para JavaScript) -->
+    <input type="hidden" id="aviso-id" value="{{ aviso.id }}">
+
     <h1>Detalle del aviso</h1>
     
     <section class="bloque">
@@ -64,12 +67,64 @@
       {% else %}
       <p>No hay fotos disponibles</p>
       {% endif %}
+    </section>
 
-      <div class="acciones">
-        <a class="btn-detalle" href="{{ url_for('listado') }}">Volver al listado</a>
-        <a class="btn-detalle" href="{{ url_for('index') }}">Volver a la portada</a>
+    <!-- Comentarios -->
+    <section class="bloque">
+      <h2>Comentarios</h2>
+      
+      <!-- Lista de comentarios -->
+      <div id="lista-comentarios" class="comentarios-lista">
+        <p class="cargando">Cargando comentarios...</p>
+      </div>
+
+      <!-- Formulario para agregar comentario -->
+      <div class="comentario-form-container">
+        <h3>Agregar un comentario</h3>
+        
+        <!-- Mensajes de éxito -->
+        <div id="comentario-exito" class="comentario-exito" style="display: none;"></div>
+        
+        <!-- Mensajes de error -->
+        <div id="comentario-errores" class="comentario-errores" style="display: none;"></div>
+
+        <form id="form-comentario" class="comentario-form">
+          <div class="form-group">
+            <label for="comentario-nombre">Nombre *</label>
+            <input 
+              type="text" 
+              id="comentario-nombre" 
+              name="nombre" 
+              maxlength="80" 
+              placeholder="Tu nombre (3-80 caracteres)"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="comentario-texto">Comentario *</label>
+            <textarea 
+              id="comentario-texto" 
+              name="texto" 
+              rows="4" 
+              cols="50" 
+              maxlength="300" 
+              placeholder="Escribe tu comentario (mínimo 5 caracteres)"
+              required></textarea>
+            <small class="ayuda">Mínimo 5 caracteres, máximo 300</small>
+          </div>
+
+          <button type="button" id="btn-agregar-comentario" class="btn-agregar">
+            Agregar comentario
+          </button>
+        </form>
       </div>
     </section>
+
+    <!-- Botones de navegación -->
+    <div class="acciones">
+      <a class="btn-detalle" href="{{ url_for('listado') }}">Volver al listado</a>
+      <a class="btn-detalle" href="{{ url_for('index') }}">Volver a la portada</a>
+    </div>
   </main>
 
   <!-- Modal para ampliar las fotos -->
@@ -80,7 +135,11 @@
     </div>
   </dialog>
 
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/comentarios.js') }}"></script>
   <script>
+
+    // Script para modal de fotos 
     const fotosBox = document.getElementById("fotos");
     const modal = document.getElementById("modal");
     const imgAmp = document.getElementById("img-ampliada");
