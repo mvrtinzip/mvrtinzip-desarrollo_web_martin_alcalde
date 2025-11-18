@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Evaluación - Adopción de Mascotas</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+    <div class="contenedor-principal">
+        <header class="encabezado">
+            <h1> Evaluación de los avisos de adopción</h1>
+            <p class="subtitulo">Sistema de calificación de avisos</p>
+        </header>
+        
+        <div id="alerta-mensaje" class="mensaje-oculto"></div>
+
+        <div class="contenedor-tabla">
+            <table class="tabla-avisos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha Publicación</th>
+                        <th>Sector</th>
+                        <th>Cantidad</th>
+                        <th>Tipo</th>
+                        <th>Edad</th>
+                        <th>Comuna</th>
+                        <th>Nota</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="aviso : ${avisos}">
+                        <td th:text="${aviso.id}"></td>
+                        <td th:text="${#temporals.format(aviso.fechaIngreso, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${aviso.sector != null ? aviso.sector : '-'}"></td>
+                        <td th:text="${aviso.cantidad}"></td>
+                        <td th:text="${aviso.tipo}"></td>
+                        <td>
+                            <span th:text="${aviso.edad}"></span>
+                            <span th:text="${aviso.unidadMedida == T(com.sistemaadopcion.tarea4.modelos.AvisoAdopcion.UnidadMedida).a ? 'años' : 'meses'}"></span>
+                        </td>
+                        <td th:text="${aviso.comuna != null ? aviso.comuna.nombre : '-'}"></td>
+                        <td>
+                            <span th:id="'promedio-' + ${aviso.id}" 
+                                  th:class="${promedios.get(aviso.id) != null ? 'valor-promedio' : 'sin-evaluacion'}"
+                                  th:text="${promedios.get(aviso.id) != null ? promedios.get(aviso.id) : '-'}">
+                            </span>
+                        </td>
+                        <td>
+                            <button class="boton-evaluar" 
+                                    th:attr="data-id-aviso=${aviso.id}"
+                                    onclick="abrirVentanaEvaluacion(this.getAttribute('data-id-aviso'))">
+                                Evaluar
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Ventana del modal -->
+    <div id="ventanaModal" class="modal">
+        <div class="contenido-modal">
+            <h3>Evaluar Aviso número <span id="idAvisoModal"></span></h3>
+            <p class="instruccion">Selecciona una calificación del 1 al 7:</p>
+            
+            <div class="selector-calificacion">
+                <button class="boton-calificacion" data-valor="1" onclick="seleccionarCalificacion(1)">1</button>
+                <button class="boton-calificacion" data-valor="2" onclick="seleccionarCalificacion(2)">2</button>
+                <button class="boton-calificacion" data-valor="3" onclick="seleccionarCalificacion(3)">3</button>
+                <button class="boton-calificacion" data-valor="4" onclick="seleccionarCalificacion(4)">4</button>
+                <button class="boton-calificacion" data-valor="5" onclick="seleccionarCalificacion(5)">5</button>
+                <button class="boton-calificacion" data-valor="6" onclick="seleccionarCalificacion(6)">6</button>
+                <button class="boton-calificacion" data-valor="7" onclick="seleccionarCalificacion(7)">7</button>
+            </div>
+
+            <div class="botones-modal">
+                <button class="boton boton-confirmar" onclick="enviarEvaluacion()">Confirmar</button>
+                <button class="boton boton-cancelar" onclick="cerrarVentana()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/evaluacion.js"></script>
+</body>
+</html>
